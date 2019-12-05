@@ -5,8 +5,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 from pathlib import Path
 
-from .mypkg import mputil
-
 
 class ConfigLoader:
     """
@@ -18,13 +16,13 @@ class ConfigLoader:
     def __init__(self):
         conf = JsonCmdLineArg.load()
         self.setting = AppSettings(conf['set'])
-        self.loads = AppLoadings(conf['load'])
-        self.saves = AppSavings(conf['save'])
+        # self.loads = AppLoadings(conf['load'])
+        # self.saves = AppSavings(conf['save'])
 
     def load(self):
         self.setting.set()
-        self.loads.set()
-        self.saves.set()
+        # self.loads.set()
+        # self.saves.set()
 
     def walk(self):
         for key, val in self._walk_generator(self.__dict__):
@@ -64,7 +62,8 @@ class _ConfMeta(metaclass=ABCMeta):
 
 class AppSettings(_ConfMeta):
     """
-    :type cpu: int
+    :type from_epsg: int
+    :type to_epsg: int
     """
 
     def __init__(self, dic):
@@ -72,10 +71,12 @@ class AppSettings(_ConfMeta):
         :type dic: dict
         """
         super().__init__(dic)
-        self.cpu = 1
+        self.from_epsg = int()
+        self.to_epsg = int()
 
     def set(self):
-        self.cpu = mputil.MpCPU(self._dic['cpu']).get()
+        self.from_epsg = self._dic['epsg']['from']
+        self.to_epsg = self._dic['epsg']['to']
 
 
 class AppLoadings(_ConfMeta):
