@@ -19,12 +19,12 @@ class ConfigLoader:
         conf = JsonCmdLineArg.load()
         self.setting = AppSettings(conf['set'])
         self.loads = AppLoadings(conf['load'])
-        # self.saves = AppSavings(conf['save'])
+        self.saves = AppSavings(conf['save'])
 
     def load(self):
         self.setting.set()
         self.loads.set()
-        # self.saves.set()
+        self.saves.set()
 
     def walk(self):
         for key, val in self._walk_generator(self.__dict__):
@@ -112,27 +112,7 @@ class LoadCoordinateInfo(_ConfMeta):
 
 class AppSavings(_ConfMeta):
     """
-    :type foo: SaveFooInfo
-    :type bar: SaveBarInfo
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__()
-        self.foo = SaveFooInfo(dic['foo'])
-        self.bar = SaveBarInfo(dic['bar'])
-
-    def set(self):
-        self.foo.set()
-        self.bar.set()
-
-
-class SaveFooInfo(_ConfMeta):
-    """
-    :type foo_a: Path
-    :type foo_b: Path
+    :type basename: Path
     """
 
     def __init__(self, dic):
@@ -140,31 +120,10 @@ class SaveFooInfo(_ConfMeta):
         :type dic: dict
         """
         super().__init__(dic)
-        self.foo_a = Path()
-        self.foo_b = Path()
+        self.basename = Path()
 
     def set(self):
-        self.foo_a = FileMaker.save(self._dic['foo_A'])
-        self.foo_b = FileMaker.base(self._dic['foo_B'])
-
-
-class SaveBarInfo(_ConfMeta):
-    """
-    :type bar_a: Path
-    :type bar_b: Path
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__(dic)
-        self.bar_a = Path()
-        self.bar_b = Path()
-
-    def set(self):
-        self.bar_a = FileMaker.save(self._dic['bar_A'])
-        self.bar_b = FileMaker.base(self._dic['bar_B'])
+        self.basename = FileMaker.base(self._dic['transform'])
 
 
 class JsonCmdLineArg:
