@@ -5,7 +5,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from pathlib import Path
 
-from .mypkg import mputil
+import numpy as np
 
 
 class ConfigLoader:
@@ -64,7 +64,8 @@ class _ConfMeta(metaclass=ABCMeta):
 
 class AppSettings(_ConfMeta):
     """
-    :type cpu: int
+    :type from_epsg: int
+    :type to_epsg: int
     """
 
     def __init__(self, dic):
@@ -72,35 +73,17 @@ class AppSettings(_ConfMeta):
         :type dic: dict
         """
         super().__init__(dic)
-        self.cpu = 1
+        self.from_epsg = int()
+        self.to_epsg = int()
 
     def set(self):
-        self.cpu = mputil.MpCPU(self._dic['cpu']).get()
+        self.from_epsg = self._dic['epsg']['from']
+        self.to_epsg = self._dic['epsg']['to']
 
 
 class AppLoadings(_ConfMeta):
     """
-    :type foo: LoadingFooInfoSetter
-    :type bar: LoadingBarInfoSetter
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__()
-        self.foo = LoadFooInfo(dic['foo'])
-        self.bar = LoadBarInfo(dic['bar'])
-
-    def set(self):
-        self.foo.set()
-        self.bar.set()
-
-
-class LoadFooInfo(_ConfMeta):
-    """
-    :type foo_a: Path
-    :type foo_b: list[Path]
+    :type coordinates: list[tuple[np.ndarray[np.float]]]
     """
 
     def __init__(self, dic):
@@ -108,56 +91,28 @@ class LoadFooInfo(_ConfMeta):
         :type dic: dict
         """
         super().__init__(dic)
-        self.foo_a = Path()
-        self.foo_b = list()
+        self.coordinates = []
 
     def set(self):
-        self.foo_a = FileMaker.load(self._dic['foo_A'])
-        self.foo_b = FileMaker.find(self._dic['foo_B'])
+        for coord in self._dic['coordinates']:
+            self.coordinates.append(LoadCoordinateInfo(coord).set())
 
 
-class LoadBarInfo(_ConfMeta):
-    """
-    :type bar_a: Path
-    :type bar_b: list[Path]
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__(dic)
-        self.bar_a = Path()
-        self.bar_b = list()
+class LoadCoordinateInfo(_ConfMeta):
 
     def set(self):
-        self.bar_a = FileMaker.load(self._dic['bar_A'])
-        self.bar_b = FileMaker.find(self._dic['bar_B'])
+        lng = np.array(self._dic['lng'])
+        lat = np.array(self._dic['lat'])
+
+        if len(lng) != len(lat):
+            raise IndexError
+
+        return lng, lat
 
 
 class AppSavings(_ConfMeta):
     """
-    :type foo: SaveFooInfo
-    :type bar: SaveBarInfo
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__()
-        self.foo = SaveFooInfo(dic['foo'])
-        self.bar = SaveBarInfo(dic['bar'])
-
-    def set(self):
-        self.foo.set()
-        self.bar.set()
-
-
-class SaveFooInfo(_ConfMeta):
-    """
-    :type foo_a: Path
-    :type foo_b: Path
+    :type basename: Path
     """
 
     def __init__(self, dic):
@@ -165,31 +120,10 @@ class SaveFooInfo(_ConfMeta):
         :type dic: dict
         """
         super().__init__(dic)
-        self.foo_a = Path()
-        self.foo_b = Path()
+        self.basename = Path()
 
     def set(self):
-        self.foo_a = FileMaker.save(self._dic['foo_A'])
-        self.foo_b = FileMaker.base(self._dic['foo_B'])
-
-
-class SaveBarInfo(_ConfMeta):
-    """
-    :type bar_a: Path
-    :type bar_b: Path
-    """
-
-    def __init__(self, dic):
-        """
-        :type dic: dict
-        """
-        super().__init__(dic)
-        self.bar_a = Path()
-        self.bar_b = Path()
-
-    def set(self):
-        self.bar_a = FileMaker.save(self._dic['bar_A'])
-        self.bar_b = FileMaker.base(self._dic['bar_B'])
+        self.basename = FileMaker.base(self._dic['transform'])
 
 
 class JsonCmdLineArg:
