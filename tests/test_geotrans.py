@@ -8,7 +8,7 @@ def test_transform():
     lng = np.array([139.691750, 141.346806, 127.680917])
     lat = np.array([35.689472, 43.064611, 26.212389])
 
-    jgd2tky = geotrans.GeoTrans(geotrans.Epsg.jgd2011, geotrans.Epsg.tokyo)
+    jgd2tky = geotrans.GeoTrans(6668, 4301)
     x, y = jgd2tky.transform(lng, lat)
 
     tky2jgd = geotrans.GeoTrans()
