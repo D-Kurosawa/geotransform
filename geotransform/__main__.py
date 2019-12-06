@@ -1,4 +1,4 @@
-"""Documents"""
+"""Transform coordinates"""
 from .conf import ConfigLoader
 from .geotrans import GeoTrans
 from .mypkg import exectime
