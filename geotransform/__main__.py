@@ -13,6 +13,9 @@ def main():
     print('Transform coordinates')
     tky2jgd2011 = GeoTrans(conf.setting.from_epsg, conf.setting.to_epsg)
 
+    print('\n>>EPSG information')
+    tky2jgd2011.print_epsg_info()
+
     for i, crd in enumerate(conf.loads.coordinates, 1):
         file = str(conf.saves.basename).format(BASE_NAME=str(i))
         xx, yy = tky2jgd2011.transform(crd[0], crd[1])
